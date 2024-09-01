@@ -1,9 +1,16 @@
 import express from "express";
 import mongoose from "mongoose";
-import { password } from './config.js';
+import dotenv from 'dotenv';
 
+dotenv.config();
 
+const dbUrl = process.env.DATABASE_URL;
 
+// realizando conexão com o Banco de dados 
+mongoose.connect(dbUrl)
+
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Failed to connect to MongoDB', err));
 
 const app = express()
 app.use(express.json())
@@ -108,6 +115,6 @@ app.put('/product/:id', async (req, res) => {
 })
 
 app.listen(port, () => {
-  mongoose.connect(password) // realizando conexão com o Banco de dados 
+  
   console.log('Server is running on port 3000')
 })  

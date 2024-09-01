@@ -22,13 +22,20 @@ const Product = mongoose.model('Product', {
 // Rota GET Product
 app.get('/', async (req, res) => {
 
-  const product = await Product.find()
-  res.status(200).send(product)
+    await Product.find()
+
+    return  res.status(200)
 })
 
 
 // Rota POST Product
 app.post('/', async (req, res) => {
+  const{name,brand,category,price,quantity,image_url} = req.body
+
+  if(!name || !brand || !category || !price || !quantity || !image_url){
+    return res.status(400).send("Incomplete data, check the request.");
+  }
+
     const product = new Product({
         name: req.body.name,
         brand: req.body.brand,
@@ -37,8 +44,9 @@ app.post('/', async (req, res) => {
         quantity: req.body.quantity,
         image_url: req.body.image_url
     })
+
     await product.save()
-    res.status(201).send(product)
+    res.status(201).send("Product saved")
 });
 
 // Rota DELETE Product

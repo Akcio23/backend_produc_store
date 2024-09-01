@@ -22,9 +22,9 @@ const Product = mongoose.model('Product', {
 // Rota GET Product
 app.get('/', async (req, res) => {
 
-    await Product.find()
+  const product = await Product.find()
 
-    return  res.status(200)
+    return  res.status(200).send(product)
 })
 
 
@@ -56,7 +56,14 @@ app.post('/', async (req, res) => {
 // Rota DELETE Product
 app.delete('/:id', async(req ,res)=>{
   try{
-     //await Product.findByIdAndDelete(req.params.id)
+
+    const product = await Product.findById(req.params.id)  // Buscando produto pelo ID
+
+    if(!product){ //Tratando erro ID invalido
+      res.status(400).send("id not found")
+    }
+
+     await Product.findByIdAndDelete(req.params.id)
      res.status(200).send("Deletado com sucesso!")
     }catch(error){
       res.status(400).send(error.message)
@@ -66,15 +73,26 @@ app.delete('/:id', async(req ,res)=>{
 // Rota PUT Product
 
 app.put('/:id', async (req, res) => {
+  try{
     const product = await Product.findByIdAndUpdate(req.params.id, {
-      name: req.body.name,
-      brand: req.body.brand,
-      category: req.body.category,
-      price: req.body.price,
-      quantity: req.body.quantity,
-      image_url: req.body.image_url
-  },{new:true})
-    res.status(200).send(product)
+    name: req.body.name,
+    brand: req.body.brand,
+    category: req.body.category,
+    price: req.body.price,
+    quantity: req.body.quantity,
+    image_url: req.body.image_url
+},{new:true})
+
+  
+if(!product){ //Tratando erro ID invalido
+    res.status(400).send("id not found")
+  }
+
+  res.status(200).send(product)
+}catch(error) {
+  res.status(400).send(error.message)
+}
+    
 })
 
 app.listen(port, () => {

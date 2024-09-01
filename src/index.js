@@ -4,99 +4,110 @@ import { password } from './config.js';
 
 
 
+
 const app = express()
 app.use(express.json())
 const port = 3000;
 
 
 // Configurando modelo de dados
-const Product = mongoose.model('Product', { 
-    name: String,
-    brand: String,
-    category: String,
-    price: Number,
-    quantity: Number,
-    image_url: String
+const Product = mongoose.model('Product', {
+  name: String,
+  brand: String,
+  category: String,
+  price: Number,
+  quantity: Number,
+  image_url: String
 });
 
 // Rota GET Product
-app.get('/', async (req, res) => {
+app.get('/product', async (req, res) => {
 
   const product = await Product.find()
 
-    return  res.status(200).send(product)
+  return res.status(200).send(product)
 })
 
 
 // Rota POST Product
-app.post('/', async (req, res) => {
-  try{const{name,brand,category,price,quantity,image_url} = req.body
+app.post('/product', async (req, res) => {
+  try {
 
-  if(!name || !brand || !category || !price || !quantity || !image_url){
-    return res.status(400).send("Incomplete data, check the request.");
-  }
+    const { name, brand, category, price, quantity, image_url } = req.body
+
+    if (!name || !brand || !category || !price || !quantity || !image_url) {
+      return res.status(400).send("Incomplete data, check the request.")
+    };
 
     const product = new Product({
-        name: req.body.name,
-        brand: req.body.brand,
-        category: req.body.category,
-        price: req.body.price,
-        quantity: req.body.quantity,
-        image_url: req.body.image_url
+      name: req.body.name,
+      brand: req.body.brand,
+      category: req.body.category,
+      price: req.body.price,
+      quantity: req.body.quantity,
+      image_url: req.body.image_url
     })
 
     await product.save()
-    res.status(201).send("Product saved")
-  }catch(error){
-    res.status(400).send(error.message)
-   }
-  
+    return res.status(201).send("Product saved")
+
+  } catch (error) {
+    
+    return res.status(400).send(error.message)
+  }
+
 });
 
 // Rota DELETE Product
-app.delete('/:id', async(req ,res)=>{
-  try{
+app.delete('/product/:id', async (req, res) => {
+  try {
 
     const product = await Product.findById(req.params.id)  // Buscando produto pelo ID
 
-    if(!product){ //Tratando erro ID invalido
-      res.status(400).send("id not found")
+    if (!product) { //Tratando erro ID invalido
+      return res.status(400).send("id not found")
     }
 
-     await Product.findByIdAndDelete(req.params.id)
-     res.status(200).send("Deletado com sucesso!")
-    }catch(error){
-      res.status(400).send(error.message)
-    }
+    await Product.findByIdAndDelete(req.params.id)
+    return res.status(200).send("Deletado com sucesso!")
+
+  } catch (error) {
+    return res.status(400).send(error.message)
+  }
 })
 
 // Rota PUT Product
 
-app.put('/:id', async (req, res) => {
-  try{
-    const product = await Product.findByIdAndUpdate(req.params.id, {
-    name: req.body.name,
-    brand: req.body.brand,
-    category: req.body.category,
-    price: req.body.price,
-    quantity: req.body.quantity,
-    image_url: req.body.image_url
-},{new:true})
+app.put('/product/:id', async (req, res) => {
+  try {
 
-  
-if(!product){ //Tratando erro ID invalido
-    res.status(400).send("id not found")
+    const product = await Product.findByIdAndUpdate(req.params.id, {
+
+      name: req.body.name,
+      brand: req.body.brand,
+      category: req.body.category,
+      price: req.body.price,
+      quantity: req.body.quantity,
+      image_url: req.body.image_url
+
+    }, { new: true })
+
+
+    if (!product) { //Tratando erro ID invalido
+      return res.status(400).send("id not found")
+
+    }
+
+    return  res.status(200).send(product)
+
+  } catch (error) {
+
+    return res.status(400).send(error.message)
   }
 
-  res.status(200).send(product)
-}catch(error) {
-  res.status(400).send(error.message)
-}
-    
 })
 
 app.listen(port, () => {
-
   mongoose.connect(password) // realizando conexão com o Banco de dados 
   console.log('Server is running on port 3000')
 })  

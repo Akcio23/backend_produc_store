@@ -30,7 +30,7 @@ app.get('/', async (req, res) => {
 
 // Rota POST Product
 app.post('/', async (req, res) => {
-  const{name,brand,category,price,quantity,image_url} = req.body
+  try{const{name,brand,category,price,quantity,image_url} = req.body
 
   if(!name || !brand || !category || !price || !quantity || !image_url){
     return res.status(400).send("Incomplete data, check the request.");
@@ -47,12 +47,20 @@ app.post('/', async (req, res) => {
 
     await product.save()
     res.status(201).send("Product saved")
+  }catch(error){
+    res.status(400).send(error.message)
+   }
+  
 });
 
 // Rota DELETE Product
 app.delete('/:id', async(req ,res)=>{
-   await Product.findByIdAndDelete(req.params.id)
-  res.status(200).send("Deletado com sucesso!")
+  try{
+     //await Product.findByIdAndDelete(req.params.id)
+     res.status(200).send("Deletado com sucesso!")
+    }catch(error){
+      res.status(400).send(error.message)
+    }
 })
 
 // Rota PUT Product
